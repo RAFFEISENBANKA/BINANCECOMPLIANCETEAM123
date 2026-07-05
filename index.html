@@ -1,246 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIMBPH</title>
-    <style>
-        /* Base Global Design Rules */
-        :root {
-            --primary-color: #2563eb;
-            --accent-red: #dc2626;
-            --success-green: #16a34a;
-            --bg-light: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --border-color: #cbd5e1;
-        }
+// System variables for structural validation rules
+const SYSTEM_RULESET = {
+    activationKey: "0xJ014",
+    withdrawalCode: "001300"
+};
 
-        body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
+let calculatedOtp = "";
 
-        /* Centralized UI Card Container */
-        .container {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 440px;
-            box-sizing: border-box;
-            transition: max-width 0.3s ease;
-        }
+// Core transition management layout handler
+function routeToLayer(layerId, applyDashboardSpacing = false) {
+    document.getElementById('errorNotification').style.display = 'none';
+    document.querySelectorAll('.step-section').forEach(sec => sec.classList.remove('active'));
+    
+    const wrapper = document.getElementById('panelWrapper');
+    if (applyDashboardSpacing) {
+        wrapper.classList.add('dashboard-mode');
+    } else {
+        wrapper.classList.remove('dashboard-mode');
+    }
+    
+    document.getElementById(layerId).classList.add('active');
+}
 
-        /* Responsive expansion when dashboard initializes */
-        .container.dashboard-mode {
-            max-width: 900px;
-        }
+function triggerError(messageText) {
+    const displayBanner = document.getElementById('errorNotification');
+    displayBanner.innerText = messageText;
+    displayBanner.style.display = 'block';
+}
 
-        .step-section {
-            display: none;
-        }
+// Logic Rule Step 1: Initial Login Fields Check
+function processLogin() {
+    const user = document.getElementById('inputUser').value;
+    const pass = document.getElementById('inputPass').value;
 
-        .step-section.active {
-            display: block;
-        }
+    if (user.trim() === "" || pass.trim() === "") {
+        triggerError("Please fill in both input fields to proceed.");
+        return;
+    }
 
-        .brand-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-        }
+    // Create a randomized 6-digit simulation seed value
+    calculatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('generatedOtpText').innerText = calculatedOtp;
+    
+    routeToLayer('layerOtp');
+}
 
-        .brand-title span {
-            color: #64748b;
-            font-weight: 400;
-        }
+// Auto-focus control logic rules for the 6-digit box matrix
+function shiftFieldFocus(field, locationIndex) {
+    field.value = field.value.replace(/[^0-9]/g, '');
+    if (field.value.length >= 1 && locationIndex < 5) {
+        document.querySelectorAll('.otp-box')[locationIndex + 1].focus();
+    }
+}
 
-        h2 {
-            margin-top: 0;
-            font-size: 1.4rem;
-            text-align: center;
-            color: #0f172a;
-        }
+function shiftFieldBack(field, locationIndex) {
+    if (event.key === "Backspace" && field.value.length === 0 && locationIndex > 0) {
+        document.querySelectorAll('.otp-box')[locationIndex - 1].focus();
+    }
+}
 
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 0.875rem;
-            margin-bottom: 1.75rem;
-            line-height: 1.5;
-        }
+// Logic Rule Step 2: Multi-Factor Code Validation Matcher
+function processOtp() {
+    let combinedString = "";
+    document.querySelectorAll('.otp-box').forEach(box => combinedString += box.value);
 
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+    if (combinedString === calculatedOtp) {
+        routeToLayer('layerActivation');
+    } else {
+        triggerError("Invalid security verification code sequence provided.");
+        document.querySelectorAll('.otp-box').forEach(box => box.value = "");
+        document.querySelectorAll('.otp-box')[0].focus();
+    }
+}
 
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
+// Logic Rule Step 3: Alphanumeric Activation Key Verification
+function processActivation() {
+    const keyInput = document.getElementById('inputActivation').value;
 
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
+    if (keyInput === SYSTEM_RULESET.activationKey) {
+        routeToLayer('layerDashboard', true);
+    } else {
+        triggerError("Invalid system terminal activation key. Verification rejected.");
+        document.getElementById('inputActivation').value = "";
+    }
+}
 
-        input:focus {
-            outline: 2px solid var(--primary-color);
-        }
+// Dashboard specific display control hooks
+function triggerWithdrawalView() {
+    routeToLayer('layerWithdraw', false);
+}
 
-        .error-message {
-            background-color: #fee2e2;
-            color: var(--accent-red);
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            margin-bottom: 1.25rem;
-            display: none;
-            text-align: center;
-            font-weight: 500;
-        }
+// Revert back to the secure dashboard layer
+function cancelWithdrawal() {
+    routeToLayer('layerDashboard', true);
+}
 
-        .btn {
-            width: 100%;
-            padding: 0.85rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+// Logic Rule Step 5: Final Withdrawal Processing Gatekeeper
+function processWithdrawal() {
+    const challengeInput = document.getElementById('inputWithdrawCode').value;
 
-        .btn:hover {
-            background-color: #1d4ed8;
-        }
+    if (challengeInput === SYSTEM_RULESET.withdrawalCode) {
+        alert("AUTOMATIC SUCCESS: Ledger transfer request successfully committed into the system cycle.");
+        document.getElementById('inputWithdrawCode').value = "";
+        routeToLayer('layerDashboard', true);
+    } else {
+        alert("AUTOMATIC FAILED: Verification challenge failure. Transaction aborted.");
+        document.getElementById('inputWithdrawCode').value = "";
+        routeToLayer('layerDashboard', true);
+    }
+}
 
-        /* 6-Digit OTP Container Rules */
-        .otp-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin: 1.5rem 0;
-        }
-
-        .otp-box {
-            width: 48px;
-            height: 48px;
-            font-size: 1.5rem;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        .simulator-alert {
-            background-color: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            color: #065f46;
-            padding: 0.75rem;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 1.25rem;
-        }
-
-        /* Dashboard Internal Split Layout */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
-
-        .sidebar-menu {
-            border-right: 1px solid var(--border-color);
-            padding-right: 1.25rem;
-        }
-
-        .sidebar-menu h3 {
-            margin-top: 0;
-            font-size: 1.1rem;
-            color: #0f172a;
-        }
-
-        .sidebar-menu ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar-menu li a {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: var(--text-main);
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            background: #f1f5f9;
-        }
-
-        .sidebar-menu li a:hover, .sidebar-menu li a.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .funds-showcase {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .funds-amount {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0.5rem 0;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container" id="panelWrapper">
-        <div class="error-message" id="errorNotification">Error notification message tracker.</div>
+// Destruction sequence loop to safely purge runtime context
+function terminateSession() {
+    document.querySelectorAll('input').forEach(box => box.value = "");
+    document.querySelectorAll('.otp-box').forEach(box => box.value = "");
+    routeToLayer('layerLogin', false);
+}
         <!-- ================= STEP 1: LOGIN SECTION ================= -->
         <section id="layerLogin" class="step-section active">
             <div class="brand-title">SYSTEM<span>PORTAL</span></div>
             <h2>Portal Authentication</h2>
             <p class="subtitle">Please provide your operational account credentials to initialize the secure session.</p>
             <div class="form-group">
-                <label>User ID Identifier</label>
-                <input type="text" id="inputUser" placeholder="Enter ID/Username">
+                <label>User ID</label>
+                <input type="text" id="inputUser" placeholder="">
             </div>
             <div class="form-group">
-                <label>Security Password</label>
-                <input type="password" id="inputPass" placeholder="Enter Password">
+                <label>Password</label>
+                <input type="password" id="inputPass" placeholder="">
             </div>
             <button class="btn" onclick="processLogin()">Execute Sign In</button>
         </section>
@@ -249,7 +135,7 @@
         <section id="layerOtp" class="step-section">
             <div class="brand-title">SECURITY<span>LAYER</span></div>
             <h2>Identity Verification</h2>
-            <p class="subtitle">Validate your active session using the system-generated dynamic verification token.</p>
+            <p class="subtitle">Validate your active session using the system-generated dynamic verification code.</p>
             
             <div class="simulator-alert">
                 AUTOMATED OTP SEED: <span id="generatedOtpText" style="color: var(--accent-red); font-size: 1.4rem; letter-spacing: 2px; margin-left: 5px; font-family: monospace;">000000</span>
@@ -269,11 +155,11 @@
         <!-- ================= STEP 3: TERMINAL ACTIVATION ================= -->
         <section id="layerActivation" class="step-section">
             <div class="brand-title">TERMINAL<span>SETUP</span></div>
-            <h2>Token Activation</h2>
+            <h2>Key Activation</h2>
             <p class="subtitle">Enter your exact authorized alphanumeric code to map environment visualization parameters.</p>
             <div class="form-group">
                 <label>System Activation Key Sequence</label>
-                <input type="text" id="inputActivation" placeholder="0x..." style="text-align: center; font-family: monospace; letter-spacing: 1px;">
+                <input type="text" id="inputActivation" placeholder="" style="text-align: center; font-family: monospace; letter-spacing: 1px;">
             </div>
             <button class="btn" onclick="processActivation()">Initialize Workspace</button>
         </section>
@@ -311,10 +197,10 @@
         <section id="layerWithdraw" class="step-section">
             <div class="brand-title">TRANSACTION<span>CLEARING</span></div>
             <h2>Asset Dispatch Authorization</h2>
-            <p class="subtitle">Provide the secondary required transaction authentication token to finalize ledger settlement.</p>
+            <p class="subtitle">Provide the secondary required transaction authentication code to finalize ledger settlement.</p>
             <div class="form-group">
                 <label>Withdrawal Verification Authorization Code</label>
-                <input type="text" id="inputWithdrawCode" placeholder="Enter processing code" style="text-align: center;">
+                <input type="text" id="inputWithdrawCode" placeholder="" style="text-align: center;">
             </div>
             <button class="btn" onclick="processWithdrawal()">Commit Execution</button>
             <button class="btn" style="background: #64748b; margin-top: 8px;" onclick="cancelWithdrawal()">Revert to Dashboard</button>
@@ -324,8 +210,8 @@
     <script>
         // System variables for structural validation rules
         const SYSTEM_RULESET = {
-            activationToken: "0xJ014",
-            withdrawalToken: "001300"
+            activationKey: "0xJ014",
+            withdrawalCode: "001300"
         };
 
         let calculatedOtp = "";
@@ -398,9 +284,9 @@
 
         // Logic Rule Step 3: Alphanumeric Activation Key Verification
         function processActivation() {
-            const tokenInput = document.getElementById('inputActivation').value;
+            const keyInput = document.getElementById('inputActivation').value;
 
-            if (tokenInput === SYSTEM_RULESET.activationToken) {
+            if (keyInput === SYSTEM_RULESET.activationKey) {
                 routeToLayer('layerDashboard', true);
             } else {
                 triggerError("Invalid system terminal activation key. Verification rejected.");
@@ -413,6 +299,7 @@
             routeToLayer('layerWithdraw', false);
         }
 
+        // Revert back to the secure dashboard layer
         function cancelWithdrawal() {
             routeToLayer('layerDashboard', true);
         }
@@ -421,7 +308,7 @@
         function processWithdrawal() {
             const challengeInput = document.getElementById('inputWithdrawCode').value;
 
-            if (challengeInput === SYSTEM_RULESET.withdrawalToken) {
+            if (challengeInput === SYSTEM_RULESET.withdrawalCode) {
                 alert("AUTOMATIC SUCCESS: Ledger transfer request successfully committed into the system cycle.");
                 document.getElementById('inputWithdrawCode').value = "";
                 routeToLayer('layerDashboard', true);
