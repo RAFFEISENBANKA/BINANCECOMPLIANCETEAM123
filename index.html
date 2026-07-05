@@ -433,12 +433,24 @@
             }
         }
 
-        // Destruction sequence loop to safely purge runtime context
-        function terminateSession() {
-            document.querySelectorAll('input').forEach(box => box.value = "");
-            document.querySelectorAll('.otp-box').forEach(box => box.value = "");
-            routeToLayer('layerLogin', false);
+         </div> <!-- Close Card Container -->
+
+    <!-- INSERT THIS EXACT TAG RIGHT HERE -->
+    <script>
+
+        // System variables for structural validation rules
+        const SYSTEM_RULESET = {
+            activationKey: "0xJ014",
+            withdrawalCode: "001300"
+        };
+
+        let calculatedOtp = "";
+
+        // Core transition management layout handler
+        function routeToLayer(layerId, applyDashboardSpacing = false) {
+            // ... rest of your JavaScript logic goes here ...
         }
-    </script>
+
+    </script> <!-- Ensure it is closed at the very bottom of the file -->
 </body>
 </html>
