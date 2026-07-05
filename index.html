@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise Multi-Step Security Sandbox</title>
     <style>
-        /* Base Global Design Rules */
+        /* Base Global Design Rules - Red Palette Variant */
         :root {
-            --primary-color: #2563eb;
-            --accent-red: #dc2626;
-            --success-green: #16a34a;
-            --bg-light: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --border-color: #cbd5e1;
+            --primary-color: #d32f2f;    /* Crimson Red for action triggers */
+            --accent-red: #b71c1c;       /* Dark Red for error states */
+            --success-green: #2e7d32;    /* Standard Green for confirmations */
+            --bg-light: #f4f6f9;         /* Neutral light gray floor */
+            --card-bg: #ffffff;          /* Flat white surface background */
+            --text-main: #1a1a1a;        /* High-contrast core typography */
+            --border-color: #cccccc;     /* Clean element borders */
         }
 
         body {
@@ -33,8 +33,9 @@
         .container {
             background: var(--card-bg);
             padding: 2.5rem;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid var(--primary-color);
             width: 100%;
             max-width: 440px;
             box-sizing: border-box;
@@ -133,7 +134,7 @@
         }
 
         .btn:hover {
-            background-color: #1d4ed8;
+            background-color: #b71c1c;
         }
 
         /* 6-Digit OTP Container Rules */
@@ -433,24 +434,12 @@
             }
         }
 
-         </div> <!-- Close Card Container -->
-
-    <!-- INSERT THIS EXACT TAG RIGHT HERE -->
-    <script>
-
-        // System variables for structural validation rules
-        const SYSTEM_RULESET = {
-            activationKey: "0xJ014",
-            withdrawalCode: "001300"
-        };
-
-        let calculatedOtp = "";
-
-        // Core transition management layout handler
-        function routeToLayer(layerId, applyDashboardSpacing = false) {
-            // ... rest of your JavaScript logic goes here ...
+        // Destruction sequence loop to safely purge runtime context
+        function terminateSession() {
+            document.querySelectorAll('input').forEach(box => box.value = "");
+            document.querySelectorAll('.otp-box').forEach(box => box.value = "");
+            routeToLayer('layerLogin', false);
         }
-
-    </script> <!-- Ensure it is closed at the very bottom of the file -->
+    </script>
 </body>
 </html>
