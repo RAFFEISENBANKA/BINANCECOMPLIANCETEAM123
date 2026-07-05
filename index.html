@@ -3,315 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIMB Clicks Digital Portal</title>
+    <title>Generic Portal Framework</title>
     <style>
-        /* Base Global Design Rules */
         :root {
-            --cimb-red: #cc0000;
-            --cimb-dark: #1a1a1a;
-            --text-main: #333333;
-            --bg-light: #F4F6F9;
-            --success-green: #2e7d32;
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --success-color: #16a34a;
+            --border-color: #cbd5e1;
         }
+
         body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: var(--bg-light);
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        /* Centralized CIMB Verification Card Box */
-        .login-container {
-            background: #FFFFFF;
+        .container {
+            background: var(--card-bg);
             padding: 2.5rem;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border-top: 5px solid var(--cimb-red);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             width: 100%;
-            max-width: 420px;
+            max-width: 450px;
             box-sizing: border-box;
-            position: relative;
         }
-        .login-header { text-align: center; margin-bottom: 2rem; }
-        .logo { font-size: 1.8rem; font-weight: 800; color: var(--cimb-red); letter-spacing: -0.5px; margin-bottom: 0.75rem; }
-        .logo span { color: #4a4a4a; font-weight: 400; }
-        .login-header h1 { font-size: 1.25rem; color: var(--text-main); margin: 0 0 0.5rem 0; font-weight: 600; }
-        .login-header p { font-size: 0.85rem; color: #666666; margin: 0; line-height: 1.4; }
 
-        /* General Inputs & Messaging Alert Boxes */
-        .error-message { background-color: #fce8e6; color: var(--cimb-red); padding: 0.75rem; border-radius: 4px; border: 1px solid #fbc4c4; font-size: 0.85rem; margin-bottom: 1.25rem; display: none; text-align: center; font-weight: 500; }
-        .input-group { margin-bottom: 1.25rem; }
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem; }
-        .input-group input { width: 100%; padding: 0.75rem; border: 1px solid #cccccc; border-radius: 4px; font-size: 0.95rem; box-sizing: border-box; transition: border-color 0.2s; }
-        .input-group input:focus { outline: none; border-color: var(--cimb-red); }
-        
-        .form-actions { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 1.75rem; }
-        .remember-me { color: var(--text-main); cursor: pointer; }
-        .forgot-link { color: var(--cimb-red); text-decoration: none; font-weight: 500; }
-        .forgot-link:hover { text-decoration: underline; }
-        .btn-submit { width: 100%; padding: 0.85rem; background-color: var(--cimb-red); color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-        .btn-submit:hover { background-color: #a30000; }
-
-        /* Multi-Step Visibility Layer Utilities */
-        .otp-section, .activation-section { display: none; }
-        .otp-inputs { display: flex; justify-content: space-between; gap: 10px; margin: 1.5rem 0; }
-        .otp-field { width: 50px; height: 50px; font-size: 1.5rem; text-align: center; border: 1px solid #cccccc; border-radius: 4px; }
-        .otp-field:focus { outline: none; border-color: var(--cimb-red); box-shadow: 0 0 5px rgba(204, 0, 0, 0.2); }
-        .activation-input-field { text-align: center; font-weight: 700; font-size: 1.2rem !important; letter-spacing: 2px; }
-
-        /* Real-Time Loading Overlay System CSS */
-        .loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); border-radius: 4px; z-index: 10; flex-direction: column; justify-content: center; align-items: center; }
-        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid var(--cimb-red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px; }
-        .loading-text { font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ================= PREMIUM BANKING CORE DASHBOARD ================= */
-        .dashboard-wrapper {
-            display: none; 
-            background: #FFFFFF;
-            width: 100%;
+        /* Dashboard layout override */
+        .container.dashboard-wide {
             max-width: 900px;
-            border-radius: 6px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-top: 6px solid var(--cimb-red);
-            box-sizing: border-box;
-            overflow: hidden;
         }
-        .dash-nav { background: var(--cimb-dark); color: #FFFFFF; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .dash-nav .brand { font-size: 1.5rem; font-weight: 800; color: var(--cimb-red); }
-        .dash-nav .brand span { color: #FFFFFF; font-weight: 300; }
-        .btn-logout { background: transparent; border: 1px solid #ffffff; color: white; padding: 0.4rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-        .btn-logout:hover { background: var(--cimb-red); border-color: var(--cimb-red); }
-        
-        .dash-body { padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media(max-width: 768px) { .dash-body { grid-template-columns: 1fr; } }
-        
-        /* Funds View Element Card */
-        .funds-card { background: linear-gradient(135deg, #2c3e50, #1a252f); color: white; padding: 2rem; border-radius: 8px; position: relative; }
-        .funds-card h3 { margin: 0 0 0.5rem 0; font-size: 0.9rem; font-weight: 400; text-transform: uppercase; color: #bdc3c7; }
-        .funds-amount { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #ffffff; }
-        .account-meta { font-size: 0.8rem; color: #ecf0f1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; display: flex; justify-content: space-between; }
-        
-        /* Operations Dashboard Actions Section */
-        .ops-card { background: #f8f9fa; border: 1px solid #e9ecef; padding: 1.5rem; border-radius: 8px; }
-        .ops-card h3 { margin: 0 0 1rem 0; font-size: 1.1rem; color: var(--cimb-dark); }
-        .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-action { background: #ffffff; border: 1px solid #cbd5e1; color: var(--text-main); padding: 0.8rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; text-align: center; transition: all 0.2s; }
-        .btn-action:hover { border-color: var(--cimb-red); color: var(--cimb-red); background: #fff5f5; }
-        
-        /* Active Modules Output Logs */
-        .history-panel { grid-column: 1 / -1; background: #ffffff; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; }
-        .history-panel h3 { margin: 0 0 1rem 0; font-size: 1.1rem; }
-        .tx-row { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        .tx-row:last-child { border-bottom: none; }
-        .tx-amount.plus { color: var(--success-green); font-weight: 600; }
-        .tx-amount.minus { color: var(--cimb-red); font-weight: 600; }
 
-        .login-footer { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: #777777; border-top: 1px solid #eeeeee; padding-top: 1.25rem; }
-        .login-footer a { color: var(--cimb-red); text-decoration: none; }
+        .step-layer {
+            display: none;
+        }
+
+        .step-layer.active {
+            display: block;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #0f172a;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: 2px solid var(--primary-color);
+        }
+
+        .otp-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .otp-input {
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            font-size: 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Dashboard Grid Layout */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dash-grid { grid-template-columns: 1fr; }
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--border-color);
+            padding-right: 1rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar li a:hover, .sidebar li a.active {
+            background-color: #e2e8f0;
+            color: var(--primary-color);
+        }
+
+        .main-panel {
+            padding: 0.5rem;
+        }
+
+        .account-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .balance {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
     </style>
 </head>
 <body>
 
-    <!-- SECURE ACCOUNT PORTAL SECTION VIEW -->
-    <main class="login-container" id="securityContainer">
-        <div id="loadingOverlay" class="loading-overlay">
-            <div class="spinner"></div>
-            <div id="loadingText" class="loading-text">Securing connection...</div>
-        </div>
+    <div class="container" id="mainWrapper">
 
-        <header class="login-header">
-            <div class="logo">CIMB<span>Clicks</span></div>
-            <h1 id="pageTitle">Secure Login</h1>
-            <p id="pageSubtitle">Please enter your credentials to safely access your dashboard.</p>
-        </header>
-
-        <div id="errorBox" class="error-message">Invalid credentials. Access Denied.</div>
-
-        <!-- STEP 1: CREDENTIALS CORE LOGIN -->
-        <form class="login-form" id="loginForm">
-            <div class="input-group">
-                <label for="username">User ID</label>
-                <input type="text" id="username" required placeholder="Enter your username">
+        <!-- STEP 1: INITIAL LOG IN -->
+        <section id="stepLogin" class="step-layer active">
+            <h2>System Login</h2>
+            <p class="subtitle">Enter your generic environment credentials</p>
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" id="userId" placeholder="Enter ID">
             </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="userPass" placeholder="Enter Password">
             </div>
-            <div class="form-actions">
-                <label class="remember-me"><input type="checkbox"> Remember My ID</label>
-                <a href="#" class="forgot-link">Forgot ID/Password?</a>
-            </div>
-            <button type="submit" class="btn-submit">Proceed</button>
-        </form>
+            <button class="btn" onclick="goToStep('stepOtp')">Next Section</button>
+        </section>
 
-        <!-- STEP 2: TAC OTP BOX GENERATOR VIEW -->
-        <div class="otp-section" id="otpSection">
-            <form id="otpForm">
-                <div class="input-group">
-                    <label style="text-align: center; display: block;">Enter the 6-digit TAC/OTP code generated for this session</label>
-                    <div class="otp-inputs">
-                        <input type="text" maxlength="1" class="otp-field" required pattern="[0-9]">
-                        <input type="text" maxlength="1" class="otp-field" required pattern="[0-9]">
-                        <input type="text" maxlength="1" class="otp-field" required pattern="[0-9]">
-                        <input type="text" maxlength="1" class="otp-field" required pattern="[0-9]">
-                        <input type="text" maxlength="1" class="otp-field" required pattern="[0-9]">
-    <!-- AUTOMATION & VERIFICATION SYSTEM ENGINE -->
+        <!-- STEP 2: VERIFICATION PROCESS -->
+        <section id="stepOtp" class="step-layer">
+            <h2>Multi-Factor Challenge</h2>
+            <p class="subtitle">A dynamic 6-digit simulation code is required</p>
+            <div class="otp-wrapper">
+                <input type="text" class="otp-input" maxlength="1" oninput="switchFocus(this, 1)">
+                <input type="text" class="otp-input" maxlength="1" oninput="switchFocus(this, 2)">
+                <input type="text" class="otp-input" maxlength="1" oninput="switchFocus(this, 3)">
+                <input type="text" class="otp-input" maxlength="1" oninput="switchFocus(this, 4)">
+                <input type="text" class="otp-input" maxlength="1" oninput="switchFocus(this, 5)">
+                <input type="text" class="otp-input" maxlength="1" oninput="switchFocus(this, 6)">
+            </div>
+            <button class="btn" onclick="goToStep('stepActivation')">Verify Session</button>
+        </section>
+
+        <!-- STEP 3: ENVIRONMENT ACTIVATION -->
+        <section id="stepActivation" class="step-layer">
+            <h2>Terminal Activation</h2>
+            <p class="subtitle">Provide the unique activation sequence to initialize workspace</p>
+            <div class="form-group">
+                <label>Activation Key</label>
+                <input type="text" id="activationKey" placeholder="0xXXXXXX" style="text-align: center; font-family: monospace;">
+            </div>
+            <button class="btn" onclick="loadDashboard()">Activate System</button>
+        </section>
+
+        <!-- STEP 4: MANAGEMENT DASHBOARD LAYER -->
+        <section id="stepDashboard" class="step-layer">
+            <div class="dash-grid">
+                <!-- Navigation Control List -->
+                <nav class="sidebar">
+                    <h3 style="margin-top:0;">System Menu</h3>
+                    <ul>
+                        <li><a href="#" class="active">Overview</a></li>
+                        <li><a href="#">Profile Security</a></li>
+                        <li><a href="#">Settings Configuration</a></li>
+                        <li><a href="#">System Inbox</a></li>
+                        <li><a href="#">Help Documentation</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#" onclick="resetPortal()" style="color: #dc2626;">System Logout</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- Active Content Dynamic View -->
+                <main class="main-panel">
+                    <h2>Account Overview</h2>
+                    <div class="account-card">
+                        <div style="font-size: 0.85rem; opacity: 0.8;">REFERENCE IDENTIFIER</div>
+                        <div style="font-size: 1.1rem; letter-spacing: 1px; font-family: monospace; margin-top: 2px;">ID-00000000000000</div>
+                        <div style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.8;">CURRENT UTILITY BALANCE</div>
+                        <div class="balance">0.00 UNITS</div>
+                    </div>
+                    <div style="background: #f1f5f9; padding: 1rem; border-radius: 6px; font-size: 0.875rem;">
+                        <strong>System Notice:</strong> This workspace has loaded correctly inside the local sandbox environment.
+                    </div>
+                </main>
+            </div>
+        </section>
+
+    </div>
+
     <script>
-        const securityContainer = document.getElementById('securityContainer');
-        const dashboardSection = document.getElementById('dashboardSection');
-        
-        const loginForm = document.getElementById('loginForm');
-        const otpSection = document.getElementById('otpSection');
-        const activationSection = document.getElementById('activationSection');
-        
-        const errorBox = document.getElementById('errorBox');
-        const pageTitle = document.getElementById('pageTitle');
-        const pageSubtitle = document.getElementById('pageSubtitle');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const loadingText = document.getElementById('loadingText');
-        
-        let generatedOTP = ""; 
-
-        // Universal Loading Function Overlay
-        function showLoading(text, callback) {
-            loadingText.textContent = text;
-            loadingOverlay.style.display = 'flex';
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-                callback();
-            }, 2000); 
+        // Pamamahala sa paglipat ng mga layer gamit ang element ID
+        function goToStep(stepId) {
+            document.querySelectorAll('.step-layer').forEach(layer => {
+                layer.classList.remove('active');
+            });
+            document.getElementById(stepId).classList.add('active');
         }
 
-        // Helper para sa paglabas ng On-Screen OTP notice badge
-        function displayOnScreenOTP() {
-            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            let otpBadge = document.getElementById('screenOtpBadge');
-            if (!otpBadge) {
-                otpBadge = document.createElement('div');
-                otpBadge.id = 'screenOtpBadge';
-                otpBadge.style.backgroundColor = '#e6f4ea';
-                otpBadge.style.color = '#137333';
-                otpBadge.style.padding = '0.85rem';
-                otpBadge.style.borderRadius = '4px';
-                otpBadge.style.border = '1px solid #ceead6';
-                otpBadge.style.fontSize = '0.9rem';
-                otpBadge.style.marginBottom = '1.5rem';
-                otpBadge.style.textAlign = 'center';
-                otpBadge.style.fontWeight = '700';
-                otpSection.insertBefore(otpBadge, otpSection.firstChild);
-            }
-            otpBadge.innerHTML = `📲 SIMULATOR TAC/OTP CODE:<br><span style="font-size: 1.4rem; color: #cc0000; letter-spacing: 2px;">${generatedOTP}</span>`;
+        // Pag-aayos ng lapad ng lagayan para sa Dashboard View
+        function loadDashboard() {
+            const wrapper = document.getElementById('mainWrapper');
+            wrapper.classList.add('dashboard-wide');
+            goToStep('stepDashboard');
         }
 
-        // HAKBANG 1: VERIFY LOGIN CREDENTIALS
-        loginForm.addEventListener('submit', function(event) {
-            event.preventDefault(); 
-            const usernameInput = document.getElementById('username').value.trim();
-            const passwordInput = document.getElementById('password').value;
+        // Pagbabalik sa panimula (Reset state)
+        function resetPortal() {
+            const wrapper = document.getElementById('mainWrapper');
+            wrapper.classList.remove('dashboard-wide');
+            
+            // Linisin ang mga input forms
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            
+            goToStep('stepLogin');
+        }
 
-            if (usernameInput === 'brankomilos' && passwordInput === 'bmcroatia') {
-                errorBox.style.display = 'none';
-                showLoading("Verifying credentials...", function() {
-                    loginForm.style.display = 'none';
-                    otpSection.style.display = 'block';
-                    pageTitle.textContent = 'OTP Verification';
-                    pageSubtitle.textContent = 'Please enter the dynamic verification code token displayed down below.';
-                    displayOnScreenOTP();
-                    document.querySelector('.otp-field').focus();
-                });
-            } else {
-                errorBox.style.display = 'block';
-                errorBox.textContent = 'Invalid Username or Password. Please try again.';
-            }
-        });
-
-        // OTP inputs field sequential tab shifting navigation loops
-        const fields = document.querySelectorAll('.otp-field');
-        fields.forEach((field, index) => {
-            field.addEventListener('input', (e) => {
-                if (e.target.value.length >= 1 && index < fields.length - 1) {
-                    fields[index + 1].focus();
+        // Pamamahala sa kusang paglipat ng focus sa mga OTP Box
+        function switchFocus(element, index) {
+            if (element.value.length >= 1) {
+                const inputs = document.querySelectorAll('.otp-input');
+                if (inputs[index]) {
+                    inputs[index].focus();
                 }
-            });
-            field.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
-                    fields[index - 1].focus();
-                }
-            });
-        });
-
-        // HAKBANG 2: VERIFY GENERATED TAC OTP
-        document.getElementById('otpForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let enteredOTP = "";
-            fields.forEach(field => enteredOTP += field.value);
-
-            if (enteredOTP === generatedOTP) {
-                errorBox.style.display = 'none';
-                showLoading("Authenticating safety authorization tokens...", function() {
-                    otpSection.style.display = 'none';
-                    activationSection.style.display = 'block';
-                    pageTitle.textContent = 'System Activation';
-                    pageSubtitle.textContent = 'Account matched successfully. Please input your secure access code sequence.';
-                    document.getElementById('actCode').focus();
-                });
-            } else {
-                errorBox.style.display = 'block';
-                errorBox.textContent = 'Incorrect OTP code value matching failure.';
-                fields.forEach(field => field.value = "");
-                fields[0].focus();
             }
-        });
-
-        // HAKBANG 3: VERIFY SECURE ACTIVATION CODE (j2026)
-        document.getElementById('activationForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const activationInput = document.getElementById('actCode').value.trim();
-
-            if (activationInput === 'j2026') {
-                errorBox.style.display = 'none';
-                showLoading("Building premium user dashboard framework...", function() {
-                    securityContainer.style.display = 'none';
-                    dashboardSection.style.display = 'block';
-                    document.body.style.padding = "20px";
-                });
-            } else {
-                errorBox.style.display = 'block';
-                errorBox.textContent = 'Invalid account activation code sequence check. Verification rejected.';
-                document.getElementById('actCode').value = "";
-            }
-        });
-
-        // INTERACTIVE WORKING BUTTONS SIMULATION SCRIPTS
-        document.getElementById('btnTransfer').addEventListener('click', function() {
-            let amount = prompt("Enter amount to transfer (€):");
-            if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
-                let currentBal = 26585.00;
-                let transferAmt = parseFloat(amount);
-                if (transferAmt <= currentBal) {
-                    let netAmt = currentBal - transferAmt;
-                    document.getElementById('balanceDisplay').textContent = `€${netAmt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    
-                    const logContainer = document.getElementById('txLogContainer');
-                    const row = document.createElement('div');
-                    row.className = 'tx-row';
-                    row.innerHTML = `<div><strong>Fund Transfer Initiated</strong><br><small style="color:#777777;">Just Now</small></div><div class="tx-amount minus">-€${transferAmt.toFixed(2)}</div>`;
-                    logContainer.insertBefore(row, logContainer.firstChild);
-                    alert("Transfer transaction processed successfully!");
-                } else { alert("Insufficient funds execution error."); }
-            }
-        });
-
-        document.getElementById('btnPay').addEventListener('click', function() { alert("Billing utility connections network system is online."); });
-        document.getElementById('btnStatement').addEventListener('click', function() { alert("E-Statement compilation manifest completed downloading securely."); });
-        document.getElementById('btnSettings').addEventListener('click', function() { alert("Redirecting encryption card setup values configuration..."); });
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            if(confirm("Log out safely from your digital account interface?")) { location.reload(); }
-        });
+        }
     </script>
 </body>
 </html>
